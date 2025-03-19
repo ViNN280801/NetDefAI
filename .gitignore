@@ -26,11 +26,6 @@ logs/
 *.rpm
 *.jar
 
-# AI models
-models/
-*.pt
-*.joblib
-
 # Datasets
 datasets/
 *.csv
