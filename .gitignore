@@ -1,0 +1,47 @@
+# VSCode files
+.vscode/
+
+# Python cache
+__pycache__/
+
+# Logs
+logs/
+*.log
+
+# Arhives
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.lzma
+*.tar.lz
+*.tar.7z
+*.rar
+*.7z
+*.iso
+*.dmg
+*.pkg
+*.deb
+*.rpm
+*.jar
+
+# AI models
+models/
+*.pt
+*.joblib
+
+# Datasets
+datasets/
+*.csv
+
+# Any images except ANN architecture
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+!visualizations/
+!visualizations/ann_architecture.png
