@@ -1,0 +1,29 @@
+colorlog
+joblib
+matplotlib
+numpy
+pandas
+scikit-learn
+seaborn
+PyYAML
+matplotlib
+tensorflow
+psutil
+GPUtil
+
+# Optional hardware acceleration
+torch
+
+# TensorFlow is optional and may not be available for all Python versions/platforms
+# Uncomment the specific option below that matches your platform
+# or run: pip install tensorflow (may fail on some platforms)
+ 
+# For CPU-only installations
+# tensorflow-cpu>=2.10.0
+
+# Python 3.12.7 supports CUDA
+# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+# For specific Python versions/platforms (examples):
+# tensorflow-macos>=2.10.0; sys_platform == 'darwin' and platform_machine == 'arm64'  # Apple Silicon
+# tensorflow>=2.10.0; platform_machine != 'arm64' and python_version < '3.13'  # Other platforms with Python < 3.13
