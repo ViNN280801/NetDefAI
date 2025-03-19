@@ -39,4 +39,4 @@ datasets/
 *.tiff
 *.ico
 !visualizations/
-!visualizations/ann_architecture.png
+!visualizations/nn_architecture.png
