@@ -6,8 +6,6 @@ pandas
 scikit-learn
 seaborn
 PyYAML
-matplotlib
-tensorflow
 psutil
 GPUtil
 
