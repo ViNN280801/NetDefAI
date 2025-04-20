@@ -8,8 +8,9 @@ by combining normal requests with attack patterns from the patterns directory.
 
 import os
 import sys
-import argparse
 import random
+import string
+import argparse
 import pandas as pd
 import numpy as np
 from typing import List, Dict, Optional
@@ -27,6 +28,24 @@ ATTACK_TYPES = ["dos", "path_traversal", "sql_injection", "xss"]
 PATTERNS_DIR = os.path.join(current_dir, "patterns")
 OUTPUT_DIR = os.path.join(current_dir, "datasets")
 ATTACKS_DIR = os.path.join(current_dir, "attacks")
+
+
+def random_case(s: str) -> str:
+    return "".join(c.upper() if c.isalpha() and random.random() < 0.5 else c for c in s)
+
+
+def insert_whitespace(s: str, p: float = 0.05) -> str:
+    return "".join(c + (" " if random.random() < p else "") for c in s)
+
+
+def fuzz_percent_encode(s: str, p: float = 0.1) -> str:
+    out = []
+    for c in s:
+        if random.random() < p and c not in "/:?=& \r\n":
+            out.append(f"%{ord(c):02X}")
+        else:
+            out.append(c)
+    return "".join(out)
 
 
 def load_attack_patterns(attack_type: str) -> List[str]:
@@ -148,9 +167,20 @@ def generate_dataset(
             num_malicious=num_malicious,
             random_seed=random_seed,
         )
+
+        dataset = dataset.sample(frac=1, random_state=random_seed).reset_index(
+            drop=True
+        )
     except Exception as e:
         logger.error(f"Error generating dataset with helper: {e}")
         return pd.DataFrame()
+
+    def obfuscate_text(s: str) -> str:
+        return insert_whitespace(fuzz_percent_encode(random_case(s), p=0.15), p=0.05)
+
+    for col in ("request", "path", "query", "payload"):
+        if col in dataset.columns:
+            dataset[col] = dataset[col].apply(obfuscate_text)
 
     # Ensure the output directory exists
     if output_file:
