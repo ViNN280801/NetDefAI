@@ -1,0 +1,25 @@
+digraph DatasetGenerator {
+    rankdir=TB;
+    node [fontname="Arial", fontsize=12];
+    
+    Start       [label="Начало", shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+    End         [label="Конец",  shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+    
+    LoadPatterns    [label="Загрузить шаблоны атак (load_attack_patterns)", shape=parallelogram];
+    ImportHelper    [label="Импорт модуля-хелпера (get_attack_helper)", shape=parallelogram];
+    SaveDataset     [label="Сохранить CSV (to_csv)", shape=parallelogram];
+    
+    CalcCounts      [label="Вычислить число вредоносных экземпляров и невредоносных", shape=box];
+    GenerateMixed   [label="Сгенерировать размеченный датасет", shape=box];
+    ShuffleData     [label="Перемешать данные", shape=box];
+    ObfuscateText   [label="Обфускация текстовых полей (random_case,percent-encode,insert_whitespace)", shape=box];
+    
+    Start -> LoadPatterns;
+    LoadPatterns -> ImportHelper;
+    ImportHelper -> CalcCounts;
+    CalcCounts -> GenerateMixed;
+    GenerateMixed -> ShuffleData;
+    ShuffleData -> ObfuscateText;
+    ObfuscateText -> SaveDataset;
+    SaveDataset -> End;
+}
