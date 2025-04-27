@@ -1,0 +1,24 @@
+digraph ОценкаSVM {
+    graph [rankdir=TB];
+    node [fontname="Arial", fontsize=12, shape=box];
+    edge [arrowsize=0.7];
+
+    Start       [label="Начало", shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+    End         [label="Конец",  shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+
+    LoadTable       [label="Загрузка таблицы:\nraw = readtable(filename,\n 'TextType','string')", shape=parallelogram];
+    ExtractFields   [label="Извлечение полей:\ntexts = raw.(textColumn)\nlabels = raw.label"];
+    Tokenize        [label="Токенизация:\ndocuments = tokenizedDocument(texts)"];
+    SplitData       [label="Разбиение на train/test:\ncv = cvpartition(labels,'HoldOut',0.3)\ndocsTrain/docsTest\nyTrain/yTest"];
+    BuildVocabulary [label="Построение словаря и отбраковка:\nbag = bagOfWords(docsTrain)\nbag = removeInfrequentWords(bag,100)"];
+    ComputeTFIDF    [label="TF-IDF:\nXTrain = full(tfidf(bag, docsTrain))\nXTest = full(tfidf(bag, docsTest))"];
+    Normalize       [label="L2-нормализация строк:\nXTrain = XTrain ./ (sqrt(sum(XTrain.^2,2)) + eps)\nXTest = XTest ./ (sqrt(sum(XTest.^2,2)) + eps)"];
+    TrainModel      [label="Обучение SVM:\nmodel = fitclinear(XTrain,yTrain,\n 'Learner','svm', 'Solver','lbfgs')"];
+    Predict         [label="Прогноз:\n[yPred, score] = predict(model,XTest)"];
+    ComputeMetrics  [label="Вычисление метрик:\nTP, TN, FP, FN\naccuracy, precision,\nrecall, f1_score"];
+    PrintMetrics    [label="Вывод метрик:\nfprintf(...)", shape=parallelogram];
+
+    Start -> LoadTable -> ExtractFields -> Tokenize -> SplitData -> BuildVocabulary
+          -> ComputeTFIDF -> Normalize -> TrainModel -> Predict
+          -> ComputeMetrics -> PrintMetrics -> End;
+}

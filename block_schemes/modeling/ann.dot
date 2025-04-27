@@ -1,0 +1,29 @@
+digraph ANN_Modeling {
+    graph [rankdir=TB];
+    node [fontname="Arial", fontsize=12, shape=box];
+    edge [arrowsize=0.7];
+
+    Start       [label="Начало", shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+    End         [label="Конец",  shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+
+    LoadParams      [label="Загрузка параметров сети:\nparams = load('params_ann.mat')", shape=parallelogram];
+    DefineLayers    [label="Определение архитектуры сети:\nlayers = [featureInputLayer(100), ...\nfullyConnectedLayer(64), reluLayer(), ...\nclassificationLayer()]"];
+    ConfigTraining  [label="Настройка обучения:\noptions = trainingOptions('adam',\n'MaxEpochs',30, 'MiniBatchSize',64)"];
+    LoadDataset     [label="Загрузка датасета:\nT = readtable(filePath, 'TextType','string')", shape=parallelogram];
+    PreprocessText  [label="Предобработка текста:\ndocs = tokenizedDocument(texts)\nbag = bagOfWords(docs)\nX = full(tfidf(bag, docs))"];
+    AdjustFeatures  [label="Корректировка признаков:\nif size(X,2) > 100: PCA\nelseif size(X,2) < 100: padding"];
+    SplitData       [label="Разделение данных:\ncv = cvpartition(labels,'HoldOut',0.3)\nXTrain/XTest, yTrain/yTest"];
+    TrainNetwork    [label="Обучение сети:\nnet = trainNetwork(XTrain,yTrain,layers,options)"];
+    Predict         [label="Прогнозирование:\n[~,scores] = classify(net,XTest)\nyPred = scores(:,2) > 0.5"];
+    ComputeMetrics  [label="Вычисление метрик:\naccuracy = (TP+TN)/numel(yTest)\nprecision, recall, F1-score"];
+    PlotROC         [label="Построение ROC-кривой:\n[fpr,tpr,~,AUC] = perfcurve(yTest,scores(:,2),1)"];
+    SaveModel       [label="Сохранение модели:\nsave('trained_ANN.mat','net')", shape=parallelogram];
+
+    Start -> LoadParams -> DefineLayers -> ConfigTraining -> LoadDataset -> PreprocessText
+          -> AdjustFeatures -> SplitData -> TrainNetwork -> Predict -> ComputeMetrics
+          -> PlotROC -> SaveModel -> End;
+
+    DefineLayers    [xlabel="Архитектура определена в Deep Network Designer"];
+    AdjustFeatures  [xlabel="Приведение к 100 признакам"];
+    TrainNetwork    [xlabel="Используется Adam optimizer"];
+}

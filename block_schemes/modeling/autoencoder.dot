@@ -1,0 +1,24 @@
+digraph AutoencoderAlgorithm {
+    graph [rankdir=TB];
+    node [fontname="Arial", fontsize=12, shape=box];
+    edge [arrowsize=0.7];
+
+    Start       [label="Начало", shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+    End         [label="Конец",  shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+
+    LoadData    [label="Загрузка данных:\nЧтение CSV-файла с исходными данными.\nraw = readtable(filePath, 'VariableNamingRule', 'preserve')", shape=parallelogram];
+    Preprocess  [label="Предобработка данных:\nИзвлечение признаков и обработка пропусков.\nX = table2array(raw(:, numericCols)); X(isnan(X)) = 0"];
+    SplitData   [label="Разделение данных:\n70% train, 30% test.\ncv = cvpartition(isNormal, 'HoldOut', 0.3)"];
+    Normalize   [label="Нормализация (Z-score):\nПриведение данных к единому масштабу.\n[XTrain, mu, sigma] = zscore(XTrain)"];
+    SelectNormal [label="Выбор нормальных данных:\nТолько для обучения автоэнкодера.\nXNormal = XTrain(yTrain, :)"];
+    DefineArch  [label="Определение архитектуры:\nСоздание слоев автоэнкодера.\nlayers = [featureInputLayer(...), fullyConnectedLayer(...), ...]"];
+    TrainAE     [label="Обучение автоэнкодера:\nИспользование Adam optimizer.\nnet = trainNetwork(XNormal, XNormal, layers, options)"];
+    ComputeThreshold [label="Вычисление порога аномалий:\nmean + 3*std ошибок реконструкции.\nthreshold = mean(errTrain) + 3 * std(errTrain)"];
+    Evaluate    [label="Оценка на тестовых данных:\nРеконструкция и вычисление ошибок.\nerrTest = mean((XTest - reconTest) .^ 2, 2)"];
+    ComputeMetrics [label="Вычисление метрик:\nAccuracy, Precision, Recall, F1-score.\naccuracy = sum(yPred == yTestBinary) / numel(yTestBinary)"];
+    PlotResults [label="Визуализация результатов:\nГрафики ошибок и ROC-кривая.\nscatter(1:length(errTest), errTest, 'filled')"];
+
+    Start -> LoadData -> Preprocess -> SplitData -> Normalize -> SelectNormal
+          -> DefineArch -> TrainAE -> ComputeThreshold -> Evaluate
+          -> ComputeMetrics -> PlotResults -> End;
+}
