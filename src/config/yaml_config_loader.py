@@ -1,7 +1,6 @@
 import yaml
 from pathlib import Path
 from src.logger import Logger
-from src.utils import check_file_path
 from typing import Any, Dict, Optional, Union
 from src.logger.logger_settings import config_loader_logger
 
@@ -44,6 +43,26 @@ class YamlConfigLoader:
             config_path (str): Path to the YAML configuration file.
             logger (Optional[Logger]): Custom logger instance. Defaults to the global config_logger.
         """
+
+        def check_file_path(filepath: Union[str, Path]) -> Union[str, Path]:
+            """
+            Checks if the file path exists and is a file.
+            """
+            from os.path import exists, isfile
+            from os import access, R_OK
+
+            if not isinstance(filepath, (str, Path)):
+                raise TypeError(f"File path is not a string or Path: {type(filepath)}")
+            if not filepath:
+                raise ValueError("File path is empty")
+            if not exists(filepath):
+                raise FileNotFoundError(f"File not found: {filepath}")
+            if not isfile(filepath):
+                raise FileNotFoundError(f"File is not a file: {filepath}")
+            if not access(filepath, R_OK):
+                raise PermissionError(f"File is not readable: {filepath}")
+            return filepath
+
         check_file_path(config_path)
 
         self.config_path = config_path

@@ -12,7 +12,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn.utils import parallel_backend
 from joblib import parallel_backend as joblib_parallel_backend
-from logger import universal_trainer_logger
+from src.logger.logger_settings import universal_trainer_logger as logger
 
 # For ANN model
 import torch
@@ -120,7 +120,7 @@ class UniversalTrainer:
                 self.torch_device = torch.device("mps")
             else:
                 self.torch_device = torch.device("cpu")
-            universal_trainer_logger.info(f"Using PyTorch device: {self.torch_device}")
+            logger.info(f"Using PyTorch device: {self.torch_device}")
 
         # Configure n_jobs for parallel processing
         if n_jobs is None:
@@ -163,7 +163,7 @@ class UniversalTrainer:
             # Initialize scikit-learn models immediately
             if "n_jobs" in self.MODELS[model_type]().get_params():
                 self.model_params["n_jobs"] = self.n_jobs
-                universal_trainer_logger.info(
+                logger.info(
                     f"Setting {model_type} to use {self.n_jobs} CPU cores"
                 )
             self.model = self.MODELS[model_type](**self.model_params)
@@ -252,7 +252,7 @@ class UniversalTrainer:
 
         # Training loop
         self.model.train()
-        universal_trainer_logger.info(
+        logger.info(
             f"Training ANN model for {self.ann_params['epochs']} epochs"
         )
 
@@ -274,7 +274,7 @@ class UniversalTrainer:
                 running_loss += loss.item()
 
             # Print statistics
-            universal_trainer_logger.info(
+            logger.info(
                 f"Epoch {epoch+1}/{self.ann_params['epochs']}, Loss: {running_loss/len(train_loader):.4f}"
             )
 
@@ -289,8 +289,8 @@ class UniversalTrainer:
         report = classification_report(y_test, predicted, output_dict=True)
         conf_matrix = confusion_matrix(y_test, predicted)
 
-        universal_trainer_logger.info(f"ANN model accuracy: {accuracy:.4f}")
-        universal_trainer_logger.info(
+        logger.info(f"ANN model accuracy: {accuracy:.4f}")
+        logger.info(
             f"Classification report:\n{classification_report(y_test, predicted)}"
         )
 
@@ -315,24 +315,22 @@ class UniversalTrainer:
         Returns:
             metrics: Dictionary of evaluation metrics
         """
-        universal_trainer_logger.info(
-            f"Training {
-                self.model_type} model with {
-                self.feature_extractor_type} features"
+        logger.info(
+            f"Training {self.model_type} model with {self.feature_extractor_type} features"
         )
 
         # Preprocess data
-        universal_trainer_logger.info("Preprocessing data...")
+        logger.info("Preprocessing data...")
         X_transformed = self.preprocess(X)
 
         # Split data
-        universal_trainer_logger.info("Splitting data into train and test sets...")
+        logger.info("Splitting data into train and test sets...")
         X_train, X_test, y_train, y_test = train_test_split(
             X_transformed, y, test_size=test_size, random_state=random_state
         )
 
         # Train model with appropriate approach based on model type
-        universal_trainer_logger.info("Training model...")
+        logger.info("Training model...")
 
         if self.model_type == "ann":
             # Use custom ANN training function
@@ -348,17 +346,15 @@ class UniversalTrainer:
                 self.model.fit(X_train, y_train)
 
             # Evaluate model
-            universal_trainer_logger.info("Evaluating model...")
+            logger.info("Evaluating model...")
             y_pred = self.model.predict(X_test)
             accuracy = accuracy_score(y_test, y_pred)
             report = classification_report(y_test, y_pred, output_dict=True)
             conf_matrix = confusion_matrix(y_test, y_pred)
 
-            universal_trainer_logger.info(f"Model accuracy: {accuracy:.4f}")
-            universal_trainer_logger.info(
-                f"Classification report:\n{
-                    classification_report(
-                        y_test, y_pred)}"
+            logger.info(f"Model accuracy: {accuracy:.4f}")
+            logger.info(
+                f"Classification report:\n{classification_report(y_test, y_pred)}"
             )
 
             metrics = {
@@ -463,7 +459,7 @@ class UniversalTrainer:
         Returns:
             best_params: Best parameters found
         """
-        universal_trainer_logger.info("Tuning hyperparameters...")
+        logger.info("Tuning hyperparameters...")
 
         X_transformed = self.preprocess(X)
 
@@ -484,8 +480,8 @@ class UniversalTrainer:
         else:
             grid_search.fit(X_transformed, y)
 
-        universal_trainer_logger.info(f"Best parameters: {grid_search.best_params_}")
-        universal_trainer_logger.info(f"Best score: {grid_search.best_score_:.4f}")
+        logger.info(f"Best parameters: {grid_search.best_params_}")
+        logger.info(f"Best score: {grid_search.best_score_:.4f}")
 
         # Update model with best parameters
         self.model = self.MODELS[self.model_type](**grid_search.best_params_)
@@ -505,7 +501,7 @@ class UniversalTrainer:
         Returns:
             scores: Cross-validation scores
         """
-        universal_trainer_logger.info(
+        logger.info(
             f"Performing {cv}-fold cross-validation with {scoring} scoring"
         )
 
@@ -522,10 +518,8 @@ class UniversalTrainer:
                 self.model, X_transformed, y, cv=cv, scoring=scoring
             )
 
-        universal_trainer_logger.info(
-            f"Mean {scoring} score: {
-                scores.mean():.4f} (std: {
-                scores.std():.4f})"
+        logger.info(
+            f"Mean {scoring} score: {scores.mean():.4f} (std: {scores.std():.4f})"
         )
         return scores
 
@@ -537,7 +531,7 @@ class UniversalTrainer:
             filepath: Path to save the model
         """
         if not self.trained:
-            universal_trainer_logger.warning("Saving untrained model")
+            logger.warning("Saving untrained model")
 
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
@@ -549,7 +543,7 @@ class UniversalTrainer:
             # Save PyTorch model state
             torch_path = filepath.replace(".joblib", "_pytorch_model.pt")
             torch.save(model_state, torch_path)
-            universal_trainer_logger.info(f"PyTorch model saved to {torch_path}")
+            logger.info(f"PyTorch model saved to {torch_path}")
 
             # Save the rest of the data without the PyTorch model
             joblib.dump(
@@ -583,7 +577,7 @@ class UniversalTrainer:
                 filepath,
             )
 
-        universal_trainer_logger.info(f"Model saved to {filepath}")
+        logger.info(f"Model saved to {filepath}")
 
     @classmethod
     def load(cls, filepath, preferred_device=None):
@@ -655,7 +649,7 @@ class UniversalTrainer:
             trainer.feature_extractor = data["feature_extractor"]
             trainer.trained = data["trained"]
 
-        universal_trainer_logger.info(f"Model loaded from {filepath}")
+        logger.info(f"Model loaded from {filepath}")
         return trainer
 
 
@@ -718,10 +712,7 @@ def main():
                 y = data["label"]
 
                 metrics = trainer.train(X, y)
-                print(
-                    f"Training completed with accuracy: {
-                        metrics['accuracy']:.4f}"
-                )
+                print(f"Training completed with accuracy: {metrics['accuracy']:.4f}")
             except Exception as e:
                 print(f"Error during training: {e}")
 
@@ -747,11 +738,7 @@ def main():
                 y_pred = trainer.predict(X)
                 accuracy = accuracy_score(y, y_pred)
                 print(f"Evaluation accuracy: {accuracy:.4f}")
-                print(
-                    f"Classification report:\n{
-                        classification_report(
-                            y, y_pred)}"
-                )
+                print(f"Classification report:\n{classification_report(y, y_pred)}")
             except Exception as e:
                 print(f"Error during evaluation: {e}")
 

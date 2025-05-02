@@ -9,12 +9,12 @@ neural networks, and custom UniversalTrainer models.
 
 import os
 import sys
-import argparse
 import joblib
 import pprint
-from typing import Dict, Any, Optional
-import matplotlib.pyplot as plt
+import argparse
 import numpy as np
+import matplotlib.pyplot as plt
+from typing import Dict, Any, Optional
 
 try:
     import torch

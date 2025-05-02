@@ -11,6 +11,7 @@ import inspect
 from colorlog import ColoredFormatter
 
 SUPPORTED_LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+NEED_TO_PRINT_ADDDITIONAL_INFO = False
 
 
 class Logger:
@@ -82,12 +83,13 @@ class Logger:
             file_handler.setLevel(numeric_level)
             logger.addHandler(file_handler)
 
-        print(
-            f"ℹ️ INFO: Logger initialized for '{module_name}' with level: '{log_level}'",
-            file=sys.stdout,
-        )
-        if log_file:
-            print(f"ℹ️ INFO: Logging to file: '{log_file}'", file=sys.stdout)
+        if NEED_TO_PRINT_ADDDITIONAL_INFO:
+            print(
+                f"ℹ️ INFO: Logger initialized for '{module_name}' with level: '{log_level}'",
+                file=sys.stdout,
+            )
+            if log_file:
+                print(f"ℹ️ INFO: Logging to file: '{log_file}'", file=sys.stdout)
 
         self._loggers[module_name] = logger
         return logger

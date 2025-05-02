@@ -1,0 +1,208 @@
+{
+    "uid": "threat-dashboard",
+    "title": "Threat Detection Dashboard",
+    "timezone": "browser",
+    "schemaVersion": 37,
+    "version": 2,
+    "refresh": "1m",
+    "panels": [
+        {
+            "type": "stat",
+            "title": "SQLi Attempts (Last 5m)",
+            "targets": [
+                {
+                    "expr": "increase(sqli_attempts_total[5m])",
+                    "refId": "A"
+                }
+            ],
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 0,
+                "y": 0
+            }
+        },
+        {
+            "type": "stat",
+            "title": "XSS Attempts (Last 5m)",
+            "targets": [
+                {
+                    "expr": "increase(xss_attempts_total[5m])",
+                    "refId": "B"
+                }
+            ],
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 4,
+                "y": 0
+            }
+        },
+        {
+            "type": "stat",
+            "title": "Path Traversal (Last 5m)",
+            "targets": [
+                {
+                    "expr": "increase(traversal_attempts_total[5m])",
+                    "refId": "C"
+                }
+            ],
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 8,
+                "y": 0
+            }
+        },
+        {
+            "type": "stat",
+            "title": "Blocked IPs Now",
+            "targets": [
+                {
+                    "expr": "current_blocked_ips",
+                    "refId": "D"
+                }
+            ],
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 12,
+                "y": 0
+            }
+        },
+        {
+            "type": "stat",
+            "title": "Model Updates Total",
+            "targets": [
+                {
+                    "expr": "model_updates_total",
+                    "refId": "E"
+                }
+            ],
+            "gridPos": {
+                "h": 3,
+                "w": 4,
+                "x": 16,
+                "y": 0
+            }
+        },
+        {
+            "type": "heatmap",
+            "title": "Heatmap SQLi by IP (rate 1m)",
+            "targets": [
+                {
+                    "expr": "rate(sqli_attempts_total[1m])",
+                    "legendFormat": "{{source_ip}}",
+                    "refId": "F"
+                }
+            ],
+            "heatmap": {
+                "dataFormat": "time_series_to_heatmap"
+            },
+            "xaxis": {
+                "mode": "time"
+            },
+            "yaxis": {
+                "show": true,
+                "label": "Source IP",
+                "mode": "bucket"
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 24,
+                "x": 0,
+                "y": 3
+            }
+        },
+        {
+            "type": "heatmap",
+            "title": "Heatmap XSS by IP (rate 1m)",
+            "targets": [
+                {
+                    "expr": "rate(xss_attempts_total[1m])",
+                    "legendFormat": "{{source_ip}}",
+                    "refId": "G"
+                }
+            ],
+            "heatmap": {
+                "dataFormat": "tsbuckets",
+                "bucketSize": 0
+            },
+            "xaxis": {
+                "mode": "time"
+            },
+            "yaxis": {
+                "show": true,
+                "label": "Source IP"
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 24,
+                "x": 0,
+                "y": 9
+            }
+        },
+        {
+            "type": "heatmap",
+            "title": "Heatmap Path Traversal by IP (rate 1m)",
+            "targets": [
+                {
+                    "expr": "rate(traversal_attempts_total[1m])",
+                    "legendFormat": "{{source_ip}}",
+                    "refId": "H"
+                }
+            ],
+            "heatmap": {
+                "dataFormat": "tsbuckets",
+                "bucketSize": 0
+            },
+            "xaxis": {
+                "mode": "time"
+            },
+            "yaxis": {
+                "show": true,
+                "label": "Source IP"
+            },
+            "gridPos": {
+                "h": 6,
+                "w": 24,
+                "x": 0,
+                "y": 15
+            }
+        },
+        {
+            "type": "table",
+            "title": "Top 10 SQLi IPs",
+            "targets": [
+                {
+                    "expr": "topk(10, rate(sqli_attempts_total[5m]))",
+                    "format": "table",
+                    "refId": "I"
+                }
+            ],
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 0,
+                "y": 21
+            }
+        },
+        {
+            "type": "table",
+            "title": "Top 10 XSS IPs",
+            "targets": [
+                {
+                    "expr": "topk(10, rate(xss_attempts_total[5m]))",
+                    "format": "table",
+                    "refId": "J"
+                }
+            ],
+            "gridPos": {
+                "h": 6,
+                "w": 12,
+                "x": 12,
+                "y": 21
+            }
+        }
+    ]
+}

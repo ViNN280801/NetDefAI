@@ -1,0 +1,187 @@
+x-common-env: &common-env
+  RABBITMQ_HOST: rabbitmq
+  RABBITMQ_USER: guest
+  RABBITMQ_PASSWORD: guest
+  REDIS_HOST: redis
+  CASSANDRA_HOSTS: cassandra
+  PROMETHEUS_HOST: prometheus
+
+x-common-depends: &common-depends
+  depends_on:
+    rabbitmq:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    cassandra:
+      condition: service_healthy
+
+services:
+  api_gateway:
+    build:
+      context: .
+      dockerfile: docker/api_gateway.dockerfile
+    environment: *common-env
+    <<: *common-depends
+    ports:
+      - "8000:8000"
+    networks:
+      - threat_analysis_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    entrypoint: |
+      sh -c "
+      until nc -z rabbitmq 5672; do
+        echo 'Waiting for RabbitMQ...';
+        sleep 2;
+      done;
+      until nc -z redis 6379; do
+        echo 'Waiting for Redis...';
+        sleep 2;
+      done;
+      echo 'All the services are ready! Starting the app...';
+      exec python /app/src/api_gateway/app.py"
+
+  ai_analyzer:
+    build:
+      context: .
+      dockerfile: docker/ai_analyzer.dockerfile
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - CASSANDRA_HOSTS=cassandra
+      - REDIS_HOST=redis
+    depends_on:
+      - rabbitmq
+      - cassandra
+      - redis
+    restart: unless-stopped
+    networks:
+      - threat_analysis_network
+    volumes:
+      - ./logs:/app/logs
+      - ./models:/app/models
+      - ./config.yaml:/app/config.yaml
+
+  alert_service:
+    build:
+      context: .
+      dockerfile: docker/alert_service.dockerfile
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+    networks:
+      - threat_analysis_network
+    volumes:
+      - ./logs:/app/logs
+      - ./config.yaml:/app/config.yaml
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - threat_analysis_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cassandra:
+    image: cassandra:4
+    ports:
+      - "9042:9042"
+    environment:
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=100M
+      - CASSANDRA_CLUSTER_NAME=ThreatAnalysisCluster
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    networks:
+      - threat_analysis_network
+    healthcheck:
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - threat_analysis_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./docker/alert.rules.yaml:/etc/prometheus/alert.rules.yaml
+      - prometheus_data:/prometheus
+    networks:
+      - threat_analysis_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:9090/-/healthy"]
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+
+  grafana:
+    image: grafana/grafana:latest
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    networks:
+      - threat_analysis_network
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./docker/alertmanager.yaml:/etc/alertmanager/alertmanager.yml
+    networks:
+      - threat_analysis_network
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+
+volumes:
+  rabbitmq_data:
+  cassandra_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  threat_analysis_network:
+    driver: bridge

@@ -1,0 +1,29 @@
+groups:
+- name: security_alerts
+  rules:
+  - alert: SQLiAttempt
+    expr: sqli_attempts_total > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "SQLi attempt detected from {{ $labels.source_ip }}"
+      description: "Pattern: {{ $labels.pattern }}"
+
+  - alert: XSSAttempt
+    expr: xss_attempts_total > 0
+    for: 1m
+    labels:
+      severity: high
+    annotations:
+      summary: "XSS attempt detected from {{ $labels.source_ip }}"
+      description: "Pattern: {{ $labels.pattern }}"
+
+  - alert: PathTraversalAttempt
+    expr: traversal_attempts_total > 0
+    for: 1m
+    labels:
+      severity: high
+    annotations:
+      summary: "Path Traversal attempt detected from {{ $labels.source_ip }}"
+      description: "Pattern: {{ $labels.pattern }}"

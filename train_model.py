@@ -753,10 +753,7 @@ def predict(
 
     if probabilities is not None:
         if len(probabilities) == 2:
-            logger.info(
-                f"Probability of being malicious: {
-                    probabilities[1]:.4f}"
-            )
+            logger.info(f"Probability of being malicious: {probabilities[1]:.4f}")
         else:
             logger.info(f"Probabilities: {probabilities}")
 

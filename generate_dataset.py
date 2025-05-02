@@ -9,12 +9,11 @@ by combining normal requests with attack patterns from the patterns directory.
 import os
 import sys
 import random
-import string
 import argparse
 import pandas as pd
 import numpy as np
 from typing import List, Dict, Optional
-from src.logger import dataset_generator_logger as logger
+from src.logger.logger_settings import dataset_generator_logger as logger
 
 # Add parent directory to path so we can import modules
 current_dir = os.path.dirname(os.path.abspath(__file__))

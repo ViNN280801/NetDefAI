@@ -1,0 +1,97 @@
+api_gateway:
+  port: 8000
+  jwt_secret: "change_this_to_secure_key_in_production"
+  cors:
+    allowed_origins: [ "*" ]
+    allowed_methods: [ "GET", "POST", "PUT", "DELETE" ]
+  request_threshold: 100 # Max requests per IP in 10 seconds
+  request_window: 10 # Time window in seconds
+  error_threshold: 10 # Errors before blocking
+  error_window: 60 # Time window in seconds
+  block_duration: 600 # Block duration in seconds (10 minutes)
+
+rabbitmq:
+  host: rabbitmq
+  port: 5672
+  user: "guest"
+  password: "guest"
+  queues:
+    threat_events: "threat_events"
+    alerts: "alerts"
+
+cassandra:
+  enabled: true
+  hosts: [ cassandra ]
+  port: 9042
+  keyspace: "threat_analysis"
+  username: null
+  password: null
+  replication_factor: 3
+
+redis:
+  enabled: true
+  host: redis
+  port: 6379
+  db: 0
+  password: null
+  ttl: 3600 # Default TTL in seconds (1 hour)
+
+ai_analyzer:
+  model_path: "./models/unified_model_pytorch_model.pt" # Path to PyTorch model
+  joblib_model_path: "./models/unified_model.joblib" # Path to joblib model (fallback)
+  threshold: 0.7 # Confidence threshold for threat detection
+  preferred_device: "CPU_MULTI" # Options: CPU_SERIAL, CPU_MULTI, CUDA, MPS, TPU
+
+  # Continuous learning settings
+  enable_continuous_learning: true # Enable or disable continuous learning
+  training_buffer_size: 1000 # Maximum number of samples to keep in the training buffer
+  training_interval: 3600 # Seconds between model retraining (1 hour)
+  min_samples_to_train: 100 # Minimum number of samples needed before retraining
+  learning_rate: 0.001 # Learning rate for PyTorch models
+  training_epochs: 5 # Number of epochs to train for each update
+
+alert_service:
+  email:
+    enabled: false
+    from: "alerts@example.com"
+    to: [ "security@example.com" ]
+    server: "smtp.example.com"
+    port: 587
+    user: null
+    password: null
+    use_tls: true
+
+  # Webhook alerts
+  webhook:
+    enabled: false
+    urls: []
+
+  # Telegram alerts
+  telegram:
+    enabled: false
+    token: ""
+    chat_ids: []
+
+  # Slack alerts
+  slack:
+    enabled: false
+    webhooks: []
+
+logging:
+  level: "INFO" # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file:
+    enabled: true
+    path: "./logs"
+    max_size_mb: 10
+    backup_count: 5
+  console:
+    enabled: true
+    color: true
+
+monitoring:
+  prometheus:
+    enabled: true
+    port: 8001
+  health_check:
+    enabled: true
+    interval_seconds: 60

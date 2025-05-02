@@ -1,0 +1,44 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: [ 'alertmanager:9093' ]
+
+rule_files:
+- "/etc/prometheus/alert.rules.yaml"
+
+scrape_configs:
+- job_name: "prometheus"
+  static_configs:
+  - targets: [ "localhost:9090" ]
+
+- job_name: "api_gateway"
+  scrape_interval: 5s
+  static_configs:
+  - targets: [ "api_gateway:8000" ]
+  metrics_path: /metrics
+  metric_relabel_configs:
+  - source_labels: [ __name__ ]
+    regex: '(blocked_ips_total|sqli_attempts_total|xss_attempts_total|traversal_attempts_total)'
+    action: keep
+
+- job_name: "ai_analyzer"
+  scrape_interval: 10s
+  static_configs:
+  - targets: [ "ai_analyzer:8001" ]
+  metrics_path: /metrics
+
+- job_name: "alert_service"
+  scrape_interval: 10s
+  static_configs:
+  - targets: [ "alert_service:8002" ]
+  metrics_path: /metrics
+
+- job_name: "rabbitmq"
+  scrape_interval: 10s
+  static_configs:
+  - targets: [ "rabbitmq:15692" ]
+  metrics_path: /metrics

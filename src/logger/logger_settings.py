@@ -84,6 +84,21 @@ config_loader_logger = Logger(
     log_level="INFO", caller_module="config_loader", log_file=log_file
 )
 
+# Analyzer logger
+analyzer_logger = Logger(
+    log_level="INFO", caller_module="ai_analyzer", log_file=log_file
+)
+
+# Alert logger
+alert_logger = Logger(
+    log_level="INFO", caller_module="alert_service", log_file=log_file
+)
+
+# DB logger
+db_logger = Logger(
+    log_level="INFO", caller_module="utils.db_connectors", log_file=log_file
+)
+
 
 # Function to get appropriate logger based on attack type
 def get_dataset_logger(attack_type):

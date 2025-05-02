@@ -4,7 +4,7 @@ import torch
 import platform
 import multiprocessing
 from enum import Enum, auto
-from logger import device_manager_logger as logger
+from src.logger.logger_settings import device_manager_logger as logger
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -42,10 +42,7 @@ class DeviceManager:
 
             if torch.cuda.is_available():
                 self.available_devices.append(ComputeDevice.CUDA)
-                logger.info(
-                    f"Found CUDA device: {
-                        torch.cuda.get_device_name(0)}"
-                )
+                logger.info(f"Found CUDA device: {torch.cuda.get_device_name(0)}")
                 for i in range(torch.cuda.device_count()):
                     logger.info(f"  GPU {i}: {torch.cuda.get_device_name(i)}")
         except (ImportError, AttributeError):
@@ -97,10 +94,7 @@ class DeviceManager:
         # CPU is always available
         if self.num_cores > 1:
             self.available_devices.append(ComputeDevice.CPU_MULTI)
-            logger.info(
-                f"Multiprocessing available with {
-                    self.num_cores} CPU cores"
-            )
+            logger.info(f"Multiprocessing available with {self.num_cores} CPU cores")
 
         # Serial processing is always available as fallback
         self.available_devices.append(ComputeDevice.CPU_SERIAL)
