@@ -1,0 +1,24 @@
+digraph TestScripts {
+    graph [rankdir=TB];
+    node [fontname="Arial", fontsize=12, shape=box];
+    edge [arrowsize=0.7];
+
+    Start       [label="Начало", shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+    End         [label="Конец",  shape=ellipse, style=filled, fillcolor="#A3C1DA"];
+
+    LoadParams      [label="Загрузка параметров:\nBASE_URL, USERNAME, PASSWORD,\nDEFAULT_THREADS, DEFAULT_REQUESTS_PER_THREAD", shape=parallelogram];
+    LoadPatterns    [label="Загрузка шаблонов атак:\nXSS, DDoS, Path Traversal, SQLi", shape=parallelogram];
+    GetToken        [label="Получение токена аутентификации:\ntoken = requests.post(BASE_URL/token)", shape=parallelogram];
+    GenerateEvents  [label="Генерация тестовых событий:\nСлучайные IP, шаблоны атак, параметры запросов"];
+    AttackWorker    [label="Рабочий поток атаки:\nОтправка запросов, обработка ответов,\nподсчет успешных/заблокированных/ошибочных запросов"];
+    ThreadPool      [label="Запуск потоков:\nThreadPoolExecutor(max_workers=threads)"];
+    CollectResults  [label="Сбор результатов:\nОбщий подсчет успешных, заблокированных, ошибочных запросов"];
+    PrintResults    [label="Вывод результатов:\nПечать статистики (успешные, заблокированные, ошибки, RPS)", shape=parallelogram];
+
+    Start -> LoadParams -> LoadPatterns -> GetToken -> GenerateEvents -> AttackWorker
+          -> ThreadPool -> CollectResults -> PrintResults -> End;
+
+    LoadPatterns    [xlabel="Загрузка из файлов: xss.txt, traversal.txt, sql_injections.txt"];
+    AttackWorker    [xlabel="Используется для имитации атак"];
+    ThreadPool      [xlabel="Параллельная отправка запросов"];
+}
